@@ -82,8 +82,8 @@ root/
 
 - ### Execution
     ```bash
-    make empty
-    make part1
+    make -C part1 empty
+    make -C part1 part1
     ```
     This will run the program in /part1/bin/
 
@@ -97,38 +97,38 @@ root/
 
 - ### Loading
     ```bash
-    make load
+    make -C part2 load
     ```
     This will load the kernel module in /part2/bin/
 
 - ### Testing
     ```bash
-    make test
+    make -C part2 test
     ```
     This will test the kernel module in /part2/bin/
 
 - ### Unloading
     ```bash
-    make unload
+    make -C part2 unload
     ```
     This will unload the kernel module in /part2/bin/
 
 ### Part 3:
 - ### Compilation
     ```bash
-    make all
+    make -C part3 all
     ```
     This will compile the elevator kernel module in /part2/bin/
 
 - ### Loading
     ```bash
-    make load
+    make -C part3 load
     ```
     This will load the elevator kernel module in /part3/bin/
 
 - ### Unloading
     ```bash
-    make unload
+    make -C part3 unload
     ```
     This will unload the elevator kernel module in /part3/bin/
 
