@@ -59,6 +59,7 @@ struct passenger {
 // elevator definition
 struct elevator {
 	int state;
+	bool deactivating;
 	int current_floor;
 	int direction;
 	int num_passengers;
@@ -112,19 +113,11 @@ static int elevator_thread(void* data) {
 			continue;
 		}
 
-		if (dorm_elevator.state == DEACTIVATING) {
-			struct passenger *p, *tmp;
-			list_for_each_entry_safe(p, tmp, &dorm_elevator.passengers, list) {
-				if (p->on_elevator) {
-					list_del(&p->list);
-					kfree(p);
-				}
-			}
-			dorm_elevator.num_passengers = 0;
-			dorm_elevator.total_weight = 0;
+		if (dorm_elevator.deactivating && list_empty(&dorm_elevator.passengers)) {
 			dorm_elevator.state = OFFLINE;
+			dorm_elevator.deactivating = false;
 			mutex_unlock(&dorm_elevator.lock);
-			printk(KERN_INFO "Elevator is now OFFLINE.\n");
+			printk(KERN_INFO "Elevator is now OFFLINE\n");
 			break;
 		}
 
@@ -279,6 +272,7 @@ static int start_elevator(void) {
 	}
 
 	// init elevator
+	dorm_elevator.deactivating = false;
 	dorm_elevator.state = IDLE;
 	dorm_elevator.current_floor = MIN_FLOOR;
 	dorm_elevator.direction = 1;
@@ -301,7 +295,7 @@ static int issue_request(int start_floor, int destination_floor, int type) {
 		return 1; // invalid request
 
 	mutex_lock(&dorm_elevator.lock);
-	if (dorm_elevator.state == DEACTIVATING || dorm_elevator.state == OFFLINE) {
+	if (dorm_elevator.deactivating == true || dorm_elevator.state == OFFLINE) {
 		mutex_unlock(&dorm_elevator.lock);
 		return 1;
 	}
@@ -328,12 +322,12 @@ static int issue_request(int start_floor, int destination_floor, int type) {
 static int stop_elevator(void) {
     printk(KERN_NOTICE "Stopping the elevator...\n");
 	mutex_lock(&dorm_elevator.lock);
-	if (dorm_elevator.state == OFFLINE) {
+	if (dorm_elevator.deactivating || dorm_elevator.state == OFFLINE) {
 		mutex_unlock(&dorm_elevator.lock);
 		return 1; // elevator already offline
 	}
 
-	dorm_elevator.state = DEACTIVATING;
+	dorm_elevator.deactivating = true;
 	mutex_unlock(&dorm_elevator.lock);
 	return 0;
 }
@@ -342,15 +336,16 @@ static int stop_elevator(void) {
 static int __init elevator_module_init(void) {
 	printk(KERN_INFO "Elevator module initializing...\n");
 
-    STUB_start_elevator=start_elevator;
-    STUB_issue_request=issue_request;
-    STUB_stop_elevator=stop_elevator;
+    	STUB_start_elevator=start_elevator;
+    	STUB_issue_request=issue_request;
+    	STUB_stop_elevator=stop_elevator;
 
 	//create proc entry
 	proc_create("elevator", 0, NULL, &elevator_proc_fops);
 
 	//init elevator state
 	dorm_elevator.state = OFFLINE;
+	dorm_elevator.deactivating = false;
 	dorm_elevator.current_floor = MIN_FLOOR;
 	dorm_elevator.direction = 1;
 	dorm_elevator.num_passengers = 0;
@@ -376,16 +371,17 @@ static void __exit elevator_module_exit(void) {
     	STUB_issue_request=NULL;
     	STUB_stop_elevator=NULL;
 
-	if(dorm_elevator.thread)
-		kthread_stop(dorm_elevator.thread);
+	printk(KERN_INFO "Elevator syscalls set to NULL\n");
 
-	struct passenger *p, *tmp;
-	list_for_each_entry_safe(p, tmp, &dorm_elevator.passengers, list) {
-		list_del(&p->list);
-		kfree(p);
+	if(dorm_elevator.thread) {
+		printk(KERN_INFO "Stopping Elevator thread\n");
+		kthread_stop(dorm_elevator.thread);
+		dorm_elevator.thread = NULL;
 	}
+	printk(KERN_INFO "Elevator thread stopped\n");
 
 	remove_proc_entry("elevator", NULL);
+	printk(KERN_INFO "Proc removed\n");
 }
 
 module_init(elevator_module_init);
