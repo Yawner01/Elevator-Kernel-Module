@@ -106,7 +106,7 @@ static int elevator_thread(void* data) {
 			continue;
 		}
 
-		if (list_empty(&dorm_elevator.passengers) && dorm_elevator.deactivating == false) {
+		if (list_empty(&dorm_elevator.passengers)) {
 			dorm_elevator.state = IDLE;
 			mutex_unlock(&dorm_elevator.lock);
 			ssleep(1);
@@ -114,12 +114,12 @@ static int elevator_thread(void* data) {
 		}
 
 		if (dorm_elevator.deactivating && list_empty(&dorm_elevator.passengers)) {
-			dorm_elevator.state = OFFLINE;
-			dorm_elevator.deactivating = false;
-			mutex_unlock(&dorm_elevator.lock);
-			printk(KERN_INFO "Elevator is now OFFLINE\n");
-			break;
-		}
+                        dorm_elevator.state = OFFLINE;
+                        dorm_elevator.deactivating = false;
+                        mutex_unlock(&dorm_elevator.lock);
+                        printk(KERN_INFO "Elevator is now OFFLINE\n");
+                        break;
+                }
 
 		if (dorm_elevator.state == IDLE) {
 			struct passenger* first_p = list_first_entry(&dorm_elevator.passengers, struct passenger, list);
@@ -211,10 +211,6 @@ static int elevator_proc_show(struct seq_file *m, void *v) {
 		case MOVING_DOWN: state_str = "MOVING_DOWN"; break;
 		case LOADING_UNLOADING: state_str = "LOADING/UNLOADING"; break;
 		default: state_str = "UNKNOWN"; break;
-	}
-
-	if (dorm_elevator.deactivating == true) {
-		state_str = 'DEACTIVATING';
 	}
 
 	seq_printf(m, "Elevator state: %s\n", state_str);
