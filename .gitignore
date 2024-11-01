@@ -5,7 +5,6 @@ part2/src/**
 !part2/src/Makefile
 !part2/src/my_timer.c
 
-part3/bin/*
 part3/src/**
 !part3/src/elevator.c
 !part3/src/Makefile
