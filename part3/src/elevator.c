@@ -106,7 +106,7 @@ static int elevator_thread(void* data) {
 			continue;
 		}
 
-		if (list_empty(&dorm_elevator.passengers) && dorm_elevator.state != DEACTIVATING) {
+		if (list_empty(&dorm_elevator.passengers) && dorm_elevator.deactivating == false) {
 			dorm_elevator.state = IDLE;
 			mutex_unlock(&dorm_elevator.lock);
 			ssleep(1);
