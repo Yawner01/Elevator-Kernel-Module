@@ -213,6 +213,10 @@ static int elevator_proc_show(struct seq_file *m, void *v) {
 		default: state_str = "UNKNOWN"; break;
 	}
 
+	if (dorm_elevator.deactivating == true) {
+		state_str = 'DEACTIVATING';
+	}
+
 	seq_printf(m, "Elevator state: %s\n", state_str);
 	seq_printf(m, "Current floor: %d\n", dorm_elevator.current_floor);
 	seq_printf(m, "Current load: %d lbs\n", dorm_elevator.total_weight);
