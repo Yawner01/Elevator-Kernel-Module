@@ -133,7 +133,7 @@ root/
     This will unload the elevator kernel module in /part3/bin/
 
 ## Bugs
-- **Bug 1**: We had some issues with exiting the module without use-after-free errors. When the elevator is stopped, we interpreted the instructions as 'offloading all current passengers' as finishing the trips of all current passengers so that is what we do. The elevator module can be removed either during or after the elevator has been stopped. While this does make the user experience easier, this is a by product of the design.
+- **Bug 1**: We had some issues with exiting the module without use-after-free errors. When the elevator is stopped, we interpreted the instructions as 'offloading all current passengers' as finishing the trips of all current passengers so that is what we do. The elevator module can be removed either during or after the elevator has been stopped. While this does make the user experience easier, this is a by product of the design. The stopping does pause the issuance of new requests though.
 
 ## Considerations
 This project is designed for a linux-kernel-6.10.x running on our assigned virtual machine. Running this on any other kernel design could lead to errors.
