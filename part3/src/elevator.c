@@ -141,7 +141,6 @@ static int elevator_thread(void* data) {
 
 		if (dorm_elevator.state == MOVING_UP || dorm_elevator.state == MOVING_DOWN) {
 			dorm_elevator.current_floor += dorm_elevator.direction;
-			printk(KERN_INFO "Elevator moved to floor %d\n", dorm_elevator.current_floor);
 
 			if (dorm_elevator.current_floor > MAX_FLOOR) {
 				dorm_elevator.current_floor = MAX_FLOOR;
@@ -152,6 +151,8 @@ static int elevator_thread(void* data) {
 				dorm_elevator.direction = 1;
 				dorm_elevator.state = MOVING_UP;
 			}
+
+			printk(KERN_INFO "Elevator moved to floor %d\n", dorm_elevator.current_floor);
 
 			mutex_unlock(&dorm_elevator.lock);
 			ssleep(2);
