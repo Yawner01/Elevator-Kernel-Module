@@ -131,12 +131,14 @@ static int elevator_thread(void* data) {
                 }
 
 		if (dorm_elevator.state == IDLE) {
-			struct passenger* first_p = list_first_entry(&dorm_elevator.passengers, struct passenger, list);
+			struct passenger* first_p = list_first_entry(&dorm_elevator.passengers,
+									struct passenger, list);
 			if (first_p->destination_floor > dorm_elevator.current_floor)
 				dorm_elevator.direction = 1;
 			else
 				dorm_elevator.direction = -1;
-			dorm_elevator.state = (dorm_elevator.direction == 1) ? MOVING_UP : MOVING_DOWN;
+			dorm_elevator.state = (dorm_elevator.direction == 1)
+						 ? MOVING_UP : MOVING_DOWN;
 		}
 
 		if (dorm_elevator.state == MOVING_UP || dorm_elevator.state == MOVING_DOWN) {
@@ -152,7 +154,8 @@ static int elevator_thread(void* data) {
 				dorm_elevator.state = MOVING_UP;
 			}
 
-			printk(KERN_INFO "Elevator moved to floor %d\n", dorm_elevator.current_floor);
+			printk(KERN_INFO "Elevator moved to floor %d\n",
+					dorm_elevator.current_floor);
 
 			mutex_unlock(&dorm_elevator.lock);
 			ssleep(2);
@@ -160,32 +163,43 @@ static int elevator_thread(void* data) {
 
 			struct passenger *p, *tmp;
 			list_for_each_entry_safe(p, tmp, &dorm_elevator.passengers, list) {
-				if (p->destination_floor == dorm_elevator.current_floor && p->on_elevator) {
+				if (p->destination_floor == dorm_elevator.current_floor &&
+									p->on_elevator) {
 					dorm_elevator.num_passengers--;
-					dorm_elevator.total_weight -= (p->type == FRESHMAN) ? FRESHMAN_WEIGHT :
-									(p->type == SOPHOMORE) ? SOPHOMORE_WEIGHT :
-									(p->type == JUNIOR) ? JUNIOR_WEIGHT :
+					dorm_elevator.total_weight -= (p->type == FRESHMAN)
+									? FRESHMAN_WEIGHT :
+									(p->type == SOPHOMORE)
+									? SOPHOMORE_WEIGHT :
+									(p->type == JUNIOR)
+									? JUNIOR_WEIGHT :
 									SENIOR_WEIGHT;
 					list_del(&p->list);
 					kfree(p);
 					total_passengers_serviced++;
 					dorm_elevator.state = LOADING_UNLOADING;
-					printk(KERN_INFO "Passenger serviced at floor %d\n", dorm_elevator.current_floor);
+					printk(KERN_INFO "Passenger serviced at floor %d\n",
+								dorm_elevator.current_floor);
 				}
 			}
 			list_for_each_entry_safe(p, tmp, &dorm_elevator.passengers, list) {
-				if (p->start_floor == dorm_elevator.current_floor && !p->on_elevator) {
-					int passenger_weight = (p->type == FRESHMAN) ? FRESHMAN_WEIGHT :
-								(p->type == SOPHOMORE) ? SOPHOMORE_WEIGHT :
-								(p->type == JUNIOR) ? JUNIOR_WEIGHT :
+				if (p->start_floor == dorm_elevator.current_floor &&
+								!p->on_elevator) {
+					int passenger_weight = (p->type == FRESHMAN)
+								? FRESHMAN_WEIGHT :
+								(p->type == SOPHOMORE)
+								? SOPHOMORE_WEIGHT :
+								(p->type == JUNIOR) ?
+								JUNIOR_WEIGHT :
 								SENIOR_WEIGHT;
 					if ((dorm_elevator.num_passengers < MAX_PASSENGERS) &&
-					   ((dorm_elevator.total_weight + passenger_weight) <= MAX_WEIGHT)) {
+					   ((dorm_elevator.total_weight +
+						passenger_weight) <= MAX_WEIGHT)) {
 						dorm_elevator.num_passengers++;
 						dorm_elevator.total_weight += passenger_weight;
 						p->on_elevator = true;
 						total_passengers_waiting--;
-						printk(KERN_INFO "Passenger loaded at floor %d\n", dorm_elevator.current_floor);
+						printk(KERN_INFO "Passenger loaded at floor %d\n",
+							dorm_elevator.current_floor);
 						dorm_elevator.state = LOADING_UNLOADING;
 					} else {
 						// Full
@@ -198,7 +212,8 @@ static int elevator_thread(void* data) {
 				ssleep(1);
 				mutex_lock(&dorm_elevator.lock);
 			}
-			dorm_elevator.state = (dorm_elevator.direction == 1) ? MOVING_UP : MOVING_DOWN;
+			dorm_elevator.state = (dorm_elevator.direction == 1) ?
+						MOVING_UP : MOVING_DOWN;
 			mutex_unlock(&dorm_elevator.lock);
 		} else {
 			// unknown

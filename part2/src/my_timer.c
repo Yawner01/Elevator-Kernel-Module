@@ -24,7 +24,8 @@ static char buffer[BUF_LEN];
 static ssize_t buffer_size = 0;
 static DEFINE_MUTEX(timer_mutex);
 
-static ssize_t timer_proc_read(struct file* file, char __user *user_buffer, size_t count, loff_t *ppos) {
+static ssize_t timer_proc_read(struct file* file, char __user *user_buffer,
+						size_t count, loff_t *ppos) {
 	ssize_t ret;
 	if(*ppos > 0 || count < BUF_LEN) return 0;
 	if(!mutex_trylock(&timer_mutex)) {
@@ -44,12 +45,15 @@ static ssize_t timer_proc_read(struct file* file, char __user *user_buffer, size
 			elapsed.tv_nsec += 1000000000L;
 		}
 
-		buffer_size = scnprintf(buffer, BUF_LEN, "current time: %lld.%09ld\nelapsed time: %lld.%09ld\n",
+		buffer_size = scnprintf(buffer, BUF_LEN,
+					"current time: %lld.%09ld\nelapsed time: %lld.%09ld\n",
 					(long long) current_ts.tv_sec, current_ts.tv_nsec,
 					(long long) elapsed.tv_sec, elapsed.tv_nsec);
 
 	} else {
-		buffer_size = scnprintf(buffer, BUF_LEN, "current time: %lld.%09ld\n", (long long) current_ts.tv_sec,
+		buffer_size = scnprintf(buffer, BUF_LEN,
+					"current time: %lld.%09ld\n",
+					(long long) current_ts.tv_sec,
 					current_ts.tv_nsec);
 	}
 
