@@ -22,19 +22,19 @@ This project aims to provide a comprehensive understanding of system calls, kern
     - **Assigned to**: Jose Rodriguez, Eli Butters
 - #### Step 2: Compile and Install the Kernel
     - **Responsibilities**: Compile the kernel with the new system calls.
-    - **Assigned to**: Jose Rodriguez
+    - **Assigned to**: Jose Rodriguez, Wesley Yawn
 - #### Step 3: Test System Calls
     - **Responsibilities**: Test if the added system calls work.
-    - **Assigned to**: Jose Rodriguez
+    - **Assigned to**: Jose Rodriguez, Wesley Yawn
 - #### Step 4: Implement Elevator
     - **Responsibilities**: Implement the elevator kernel module.
-    - **Assigned to**: Jose Rodriguez, Eli Butters
+    - **Assigned to**: Jose Rodriguez, Eli Butters, Wesley Yawn
 - #### Step 5: Write to Proc File
     - **Responsibilities**: Provide an entry in /proc/elevator to display the elevators actions.
     - **Assigned to**: Wesley Yawn
 - #### Step 6: Test Elevator
     - **Responsibilities**: Interact with the provided user-space applications to communicate with the kernel module
-    - **Assigned to**: Eli Butters
+    - **Assigned to**: Eli Butters, Wesley Yawn
 
 ## File Listing
 ```
