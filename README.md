@@ -34,7 +34,7 @@ This project aims to provide a comprehensive understanding of system calls, kern
     - **Assigned to**: Wesley Yawn
 - #### Step 6: Test Elevator
     - **Responsibilities**: Interact with the provided user-space applications to communicate with the kernel module
-    - **Assigned to**: Eli Butters, Wesley Yawn
+    - **Assigned to**: Eli Butters
 
 ## File Listing
 ```
